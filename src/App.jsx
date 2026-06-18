@@ -29,10 +29,6 @@ function App() {
     solutionIndex: '',
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
-  const [highContrast, setHighContrast] = useLocalStorage(
-    'high-contrast',
-    false
-  );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
@@ -55,7 +51,6 @@ function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
-  const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -94,20 +89,11 @@ function App() {
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
     else document.body.removeAttribute('data-theme');
-
-    if (isHighContrastMode)
-      document.body.setAttribute('data-mode', 'high-contrast');
-    else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
+  }, [isDarkMode]);
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     setTheme(isDarkMode ? 'light' : 'dark');
-  };
-
-  const handleHighContrastMode = () => {
-    setIsHighContrastMode(!isHighContrastMode);
-    setHighContrast(!isHighContrastMode);
   };
 
   const handleHardMode = () => {
@@ -183,10 +169,8 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
-        isHighContrastMode={isHighContrastMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
-        setIsHighContrastMode={handleHighContrastMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
