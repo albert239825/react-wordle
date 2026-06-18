@@ -34,6 +34,12 @@
     --color-text-secondary: #adadad;
     --color-icon: #fff;
   }
+
+  [data-colorblind='true'] {
+    --color-correct: #f5793a; /* orange */
+    --color-present: #85c0f9; /* blue */
+    /* --color-absent stays the same grey */
+  }
 }
 
 body {
