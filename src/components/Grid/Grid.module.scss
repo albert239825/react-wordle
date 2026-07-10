@@ -36,6 +36,12 @@
   }
 }
 
+:global(body[data-reduced-motion='true']) {
+  .jiggle {
+    animation-duration: 0s;
+  }
+}
+
 @media screen and (max-width: 480px) {
   .grid {
     margin: 0;

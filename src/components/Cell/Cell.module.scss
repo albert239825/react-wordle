@@ -116,6 +116,14 @@
   }
 }
 
+:global(body[data-reduced-motion='true']) {
+  .fill,
+  .reveal,
+  .reveal .letter {
+    animation-duration: 0s;
+  }
+}
+
 @media screen and (max-width: 480px) {
   .cell {
     width: 55px;
