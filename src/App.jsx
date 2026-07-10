@@ -155,6 +155,17 @@ function App() {
     setCurrentGuess('');
   };
 
+  const resetStats = () => {
+    setStats({
+      winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+      gamesFailed: 0,
+      currentStreak: 0,
+      bestStreak: 0,
+      totalGames: 0,
+      successRate: 0,
+    });
+  };
+
   return (
     <div className={styles.container}>
       <Header
@@ -199,6 +210,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        resetStats={resetStats}
       />
     </div>
   );
