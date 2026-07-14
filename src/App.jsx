@@ -14,6 +14,7 @@ import {
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
+  getInitialStats,
 } from 'lib/words';
 import {
   ALERT_DELAY,
@@ -34,14 +35,7 @@ function App() {
     'colorblind-mode',
     false
   );
-  const [stats, setStats] = useLocalStorage('gameStats', {
-    winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
-    gamesFailed: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalGames: 0,
-    successRate: 0,
-  });
+  const [stats, setStats] = useLocalStorage('gameStats', getInitialStats());
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
@@ -109,6 +103,11 @@ function App() {
   const handleHardMode = () => {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
+  };
+
+  const handleResetStats = () => {
+    setStats(getInitialStats());
+    showAlert('Statistics reset', 'success');
   };
 
   const handleColorblind = () => {
@@ -199,6 +198,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        onResetStats={handleResetStats}
       />
     </div>
   );

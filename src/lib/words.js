@@ -105,6 +105,15 @@ export const findFirstUnusedReveal = (word, guesses) => {
   return false;
 };
 
+export const getInitialStats = () => ({
+  winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+  gamesFailed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  totalGames: 0,
+  successRate: 0,
+});
+
 export const addStatsForCompletedGame = (gameStats, count) => {
   // Count is number of incorrect guesses before end.
   const stats = { ...gameStats };

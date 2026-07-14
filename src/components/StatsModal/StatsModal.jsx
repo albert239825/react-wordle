@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
@@ -14,10 +15,18 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  onResetStats,
 }) => {
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleConfirmReset = () => {
+    onResetStats();
+    setIsConfirmingReset(false);
   };
 
   return (
@@ -55,6 +64,58 @@ const StatsModal = ({
           </div>
         </div>
       )}
+      <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+        {isConfirmingReset ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.75rem',
+            }}
+          >
+            <p style={{ margin: 0 }}>
+              Reset all statistics? This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={handleConfirmReset}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  color: '#fff',
+                  backgroundColor: '#c0392b',
+                }}
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setIsConfirmingReset(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsConfirmingReset(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            Reset statistics
+          </button>
+        )}
+      </div>
     </Modal>
   );
 };
