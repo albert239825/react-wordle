@@ -8,9 +8,11 @@ const SettingModal = ({
   isHardMode,
   isDarkMode,
   isColorblind,
+  isReducedMotion,
   setIsHardMode,
   setIsDarkMode,
   setIsColorblind,
+  setIsReducedMotion,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -26,6 +28,12 @@ const SettingModal = ({
         desc="High contrast colors for color vision deficiency"
         isOn={isColorblind}
         onToggle={setIsColorblind}
+      />
+      <Row
+        title="Reduced Motion"
+        desc="Disable the tile flip and jiggle animations"
+        isOn={isReducedMotion}
+        onToggle={setIsReducedMotion}
       />
     </Modal>
   );
