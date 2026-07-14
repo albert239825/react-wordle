@@ -116,6 +116,18 @@ function App() {
     setColorblindMode(!isColorblind);
   };
 
+  const handleResetStats = () => {
+    setStats({
+      winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+      gamesFailed: 0,
+      currentStreak: 0,
+      bestStreak: 0,
+      totalGames: 0,
+      successRate: 0,
+    });
+    showAlert('Statistics reset', 'success');
+  };
+
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
@@ -199,6 +211,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        onResetStats={handleResetStats}
       />
     </div>
   );
