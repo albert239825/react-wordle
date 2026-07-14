@@ -23,6 +23,15 @@ import {
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
+const getDefaultStats = () => ({
+  winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+  gamesFailed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  totalGames: 0,
+  successRate: 0,
+});
+
 function App() {
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
@@ -34,14 +43,7 @@ function App() {
     'colorblind-mode',
     false
   );
-  const [stats, setStats] = useLocalStorage('gameStats', {
-    winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
-    gamesFailed: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalGames: 0,
-    successRate: 0,
-  });
+  const [stats, setStats] = useLocalStorage('gameStats', getDefaultStats());
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
@@ -57,6 +59,11 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isColorblind, setIsColorblind] = useState(colorblindMode);
   const { showAlert } = useAlert();
+
+  const handleResetStats = () => {
+    setStats(getDefaultStats());
+    showAlert('Statistics reset', 'success');
+  };
 
   // Show welcome modal
   useEffect(() => {
@@ -199,6 +206,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        onResetStats={handleResetStats}
       />
     </div>
   );
