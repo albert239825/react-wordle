@@ -18,6 +18,10 @@
   animation-duration: 0.3s;
 }
 
+:global(body[data-reduced-motion]) .jiggle {
+  animation: none;
+}
+
 @keyframes jiggle {
   0% {
     transform: translate(0, 0);
