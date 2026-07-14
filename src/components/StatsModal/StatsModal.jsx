@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
@@ -14,10 +15,18 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  onResetStats,
 }) => {
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleConfirmReset = () => {
+    onResetStats();
+    setIsConfirmingReset(false);
   };
 
   return (
@@ -55,6 +64,63 @@ const StatsModal = ({
           </div>
         </div>
       )}
+      <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+        {!isConfirmingReset ? (
+          <button
+            onClick={() => setIsConfirmingReset(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#e74c3c',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            Reset statistics
+          </button>
+        ) : (
+          <div style={{ fontSize: '0.9rem' }}>
+            <p style={{ margin: '0 0 0.75rem' }}>
+              Reset all statistics? This cannot be undone.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.5rem',
+                justifyContent: 'center',
+              }}
+            >
+              <button
+                onClick={handleConfirmReset}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: '#e74c3c',
+                  color: '#fff',
+                  cursor: 'pointer',
+                }}
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setIsConfirmingReset(false)}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  border: '1px solid #888',
+                  borderRadius: '4px',
+                  background: 'transparent',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </Modal>
   );
 };
