@@ -34,6 +34,10 @@ function App() {
     'colorblind-mode',
     false
   );
+  const [reducedMotion, setReducedMotion] = useLocalStorage(
+    'reduced-motion',
+    false
+  );
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -56,6 +60,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isColorblind, setIsColorblind] = useState(colorblindMode);
+  const [isReducedMotion, setIsReducedMotion] = useState(reducedMotion);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -101,6 +106,12 @@ function App() {
     else document.body.removeAttribute('data-colorblind');
   }, [isColorblind]);
 
+  useEffect(() => {
+    if (isReducedMotion)
+      document.body.setAttribute('data-reduced-motion', 'true');
+    else document.body.removeAttribute('data-reduced-motion');
+  }, [isReducedMotion]);
+
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     setTheme(isDarkMode ? 'light' : 'dark');
@@ -114,6 +125,11 @@ function App() {
   const handleColorblind = () => {
     setIsColorblind(!isColorblind);
     setColorblindMode(!isColorblind);
+  };
+
+  const handleReducedMotion = () => {
+    setIsReducedMotion(!isReducedMotion);
+    setReducedMotion(!isReducedMotion);
   };
 
   const handleKeyDown = letter =>
@@ -185,9 +201,11 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isColorblind={isColorblind}
+        isReducedMotion={isReducedMotion}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsColorblind={handleColorblind}
+        setIsReducedMotion={handleReducedMotion}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
