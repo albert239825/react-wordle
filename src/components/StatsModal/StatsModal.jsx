@@ -64,56 +64,29 @@ const StatsModal = ({
           </div>
         </div>
       )}
-      <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+      <div className={styles.reset}>
         {!isConfirmingReset ? (
           <button
+            className={styles.resetLink}
             onClick={() => setIsConfirmingReset(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#e74c3c',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
           >
             Reset statistics
           </button>
         ) : (
-          <div style={{ fontSize: '0.9rem' }}>
-            <p style={{ margin: '0 0 0.75rem' }}>
+          <div>
+            <p className={styles.confirmText}>
               Reset all statistics? This cannot be undone.
             </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: '0.5rem',
-                justifyContent: 'center',
-              }}
-            >
+            <div className={styles.confirmButtons}>
               <button
+                className={styles.confirmButton}
                 onClick={handleConfirmReset}
-                style={{
-                  padding: '0.4rem 0.9rem',
-                  border: 'none',
-                  borderRadius: '4px',
-                  background: '#e74c3c',
-                  color: '#fff',
-                  cursor: 'pointer',
-                }}
               >
                 Reset
               </button>
               <button
+                className={styles.cancelButton}
                 onClick={() => setIsConfirmingReset(false)}
-                style={{
-                  padding: '0.4rem 0.9rem',
-                  border: '1px solid #888',
-                  borderRadius: '4px',
-                  background: 'transparent',
-                  color: 'inherit',
-                  cursor: 'pointer',
-                }}
               >
                 Cancel
               </button>
