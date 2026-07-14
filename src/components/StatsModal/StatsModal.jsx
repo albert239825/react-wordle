@@ -64,40 +64,20 @@ const StatsModal = ({
           </div>
         </div>
       )}
-      <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+      <div className={styles.reset}>
         {isConfirmingReset ? (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '0.75rem',
-            }}
-          >
-            <p style={{ margin: 0 }}>
-              Reset all statistics? This cannot be undone.
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div className={styles.resetConfirm}>
+            <p>Reset all statistics? This cannot be undone.</p>
+            <div className={styles.resetActions}>
               <button
+                className={styles.resetConfirmButton}
                 onClick={handleConfirmReset}
-                style={{
-                  padding: '0.5rem 1rem',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  color: '#fff',
-                  backgroundColor: '#c0392b',
-                }}
               >
                 Reset
               </button>
               <button
+                className={styles.resetButton}
                 onClick={() => setIsConfirmingReset(false)}
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
               >
                 Cancel
               </button>
@@ -105,12 +85,8 @@ const StatsModal = ({
           </div>
         ) : (
           <button
+            className={styles.resetButton}
             onClick={() => setIsConfirmingReset(true)}
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
           >
             Reset statistics
           </button>

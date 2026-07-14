@@ -94,6 +94,43 @@ h2 {
   }
 }
 
+.reset {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.resetConfirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  p {
+    margin: 0;
+    color: var(--color-text-primary);
+  }
+}
+
+.resetActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.resetButton {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.resetConfirmButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+  background: #c0392b;
+}
+
 @media screen and (max-width: 480px) {
   h2 {
     font-size: 1.2rem;
