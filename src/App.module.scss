@@ -36,6 +36,11 @@
   }
 }
 
+body[data-colorblind='true'] {
+  --color-correct: #f5793a; /* orange */
+  --color-present: #85c0f9; /* blue */
+}
+
 body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;

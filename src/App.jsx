@@ -30,6 +30,10 @@ function App() {
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [colorblindMode, setColorblindMode] = useLocalStorage(
+    'colorblind-mode',
+    false
+  );
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -50,6 +54,7 @@ function App() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
+  const [isColorblindMode, setIsColorblindMode] = useState(colorblindMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const { showAlert } = useAlert();
 
@@ -91,6 +96,12 @@ function App() {
     else document.body.removeAttribute('data-theme');
   }, [isDarkMode]);
 
+  useEffect(() => {
+    if (isColorblindMode)
+      document.body.setAttribute('data-colorblind', 'true');
+    else document.body.removeAttribute('data-colorblind');
+  }, [isColorblindMode]);
+
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     setTheme(isDarkMode ? 'light' : 'dark');
@@ -99,6 +110,11 @@ function App() {
   const handleHardMode = () => {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
+  };
+
+  const handleColorblindMode = () => {
+    setIsColorblindMode(!isColorblindMode);
+    setColorblindMode(!isColorblindMode);
   };
 
   const handleKeyDown = letter =>
@@ -169,8 +185,10 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
+        isColorblindMode={isColorblindMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
+        setIsColorblindMode={handleColorblindMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
