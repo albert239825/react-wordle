@@ -17,6 +17,11 @@ button {
   border: none;
 }
 
+.newGame {
+  display: inline-flex;
+  align-items: center;
+}
+
 @media screen and (max-width: 480px) {
   h1 {
     font-size: 2rem;
