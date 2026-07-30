@@ -36,9 +36,10 @@ const StatsModal = ({
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().slice(0, 10);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'wordle-stats.json';
+    link.download = `wordle-stats-${date}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
