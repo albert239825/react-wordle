@@ -1,10 +1,17 @@
-import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
-import './Header.module.scss';
+import {
+  BsArrowRepeat,
+  BsBarChart,
+  BsGear,
+  BsInfoCircle,
+} from 'react-icons/bs';
+import styles from './Header.module.scss';
 
 const Header = ({
   setIsInfoModalOpen,
   setIsStatsModalOpen,
   setIsSettingsModalOpen,
+  isPracticeMode,
+  onNewPracticeGame,
 }) => {
   return (
     <header>
@@ -13,8 +20,13 @@ const Header = ({
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
-      <h1>WORDLE</h1>
+      <h1>{isPracticeMode ? 'PRACTICE' : 'WORDLE'}</h1>
       <div>
+        {isPracticeMode && (
+          <button className={styles.newGame} onClick={onNewPracticeGame}>
+            <BsArrowRepeat size="1.6rem" color="var(--color-icon)" />
+          </button>
+        )}
         <button onClick={() => setIsStatsModalOpen(true)}>
           <BsBarChart size="1.6rem" color="var(--color-icon)" />
         </button>

@@ -7,8 +7,10 @@ const SettingModal = ({
   onClose,
   isHardMode,
   isDarkMode,
+  isPracticeMode,
   setIsHardMode,
   setIsDarkMode,
+  setIsPracticeMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -19,6 +21,12 @@ const SettingModal = ({
         onToggle={setIsHardMode}
       />
       <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
+      <Row
+        title="Practice Mode"
+        desc="Play unlimited random words without affecting your daily game or stats"
+        isOn={isPracticeMode}
+        onToggle={setIsPracticeMode}
+      />
     </Modal>
   );
 };

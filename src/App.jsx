@@ -14,6 +14,7 @@ import {
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
+  getRandomWord,
 } from 'lib/words';
 import {
   ALERT_DELAY,
@@ -30,6 +31,10 @@ function App() {
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [practiceMode, setPracticeMode] = useLocalStorage(
+    'practice-mode',
+    false
+  );
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -43,6 +48,8 @@ function App() {
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
+  const [practiceSolution, setPracticeSolution] = useState(getRandomWord);
+  const [practiceGuesses, setPracticeGuesses] = useState([]);
   const [isJiggling, setIsJiggling] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
@@ -51,7 +58,13 @@ function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
+  const [isPracticeMode, setIsPracticeMode] = useState(practiceMode);
   const { showAlert } = useAlert();
+
+  // Practice mode plays random words, kept out of the daily state and stats
+  const activeSolution = isPracticeMode ? practiceSolution : solution;
+  const activeGuesses = isPracticeMode ? practiceGuesses : guesses;
+  const setActiveGuesses = isPracticeMode ? setPracticeGuesses : setGuesses;
 
   // Show welcome modal
   useEffect(() => {
@@ -71,20 +84,25 @@ function App() {
 
   // Check game winning or losing
   useEffect(() => {
-    if (guesses.includes(solution.toUpperCase())) {
+    if (activeGuesses.includes(activeSolution.toUpperCase())) {
       setIsGameWon(true);
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
-      setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
-    } else if (guesses.length === MAX_CHALLENGES) {
+      if (!isPracticeMode)
+        setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
+    } else if (activeGuesses.length === MAX_CHALLENGES) {
       setIsGameLost(true);
       setTimeout(
-        () => showAlert(`The word was ${solution}`, 'error', true),
+        () => showAlert(`The word was ${activeSolution}`, 'error', true),
         ALERT_DELAY
       );
-      setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
+      if (!isPracticeMode)
+        setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
+    } else {
+      setIsGameWon(false);
+      setIsGameLost(false);
     }
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [activeGuesses, activeSolution]);
 
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
@@ -99,6 +117,19 @@ function App() {
   const handleHardMode = () => {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
+  };
+
+  const handlePracticeMode = () => {
+    setIsPracticeMode(!isPracticeMode);
+    setPracticeMode(!isPracticeMode);
+    setCurrentGuess('');
+    if (!isPracticeMode) handleNewPracticeGame();
+  };
+
+  const handleNewPracticeGame = () => {
+    setPracticeSolution(getRandomWord());
+    setPracticeGuesses([]);
+    setCurrentGuess('');
   };
 
   const handleKeyDown = letter =>
@@ -123,20 +154,26 @@ function App() {
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        activeGuesses,
+        activeSolution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
       }
     }
 
-    if (currentGuess === solution.toUpperCase()) {
-      setStats(addStatsForCompletedGame(stats, guesses.length));
-    } else if (guesses.length + 1 === MAX_CHALLENGES) {
-      setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+    if (!isPracticeMode) {
+      if (currentGuess === activeSolution.toUpperCase()) {
+        setStats(addStatsForCompletedGame(stats, activeGuesses.length));
+      } else if (activeGuesses.length + 1 === MAX_CHALLENGES) {
+        setStats(addStatsForCompletedGame(stats, activeGuesses.length + 1));
+      }
     }
 
-    setGuesses([...guesses, currentGuess]);
+    setActiveGuesses([...activeGuesses, currentGuess]);
     setCurrentGuess('');
   };
 
@@ -146,11 +183,14 @@ function App() {
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
+        isPracticeMode={isPracticeMode}
+        onNewPracticeGame={handleNewPracticeGame}
       />
       <Alert />
       <Grid
         currentGuess={currentGuess}
-        guesses={guesses}
+        guesses={activeGuesses}
+        solution={activeSolution}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
       />
@@ -158,7 +198,8 @@ function App() {
         onEnter={handleEnter}
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
-        guesses={guesses}
+        guesses={activeGuesses}
+        solution={activeSolution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -169,16 +210,18 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
+        isPracticeMode={isPracticeMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
+        setIsPracticeMode={handlePracticeMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
         gameStats={stats}
-        numberOfGuessesMade={guesses.length}
-        isGameWon={isGameWon}
-        isGameLost={isGameLost}
+        numberOfGuessesMade={isPracticeMode ? 0 : guesses.length}
+        isGameWon={!isPracticeMode && isGameWon}
+        isGameLost={!isPracticeMode && isGameLost}
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
