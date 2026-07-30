@@ -1,23 +1,70 @@
+import { useRef } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
-import { shareStatus, tomorrow } from 'lib/words';
+import { shareStatus, tomorrow, isValidStats } from 'lib/words';
+import { GAME_MODES } from 'constants/settings';
 
 const StatsModal = ({
   isOpen,
   onClose,
   gameStats,
+  setStats,
   numberOfGuessesMade,
   isGameWon,
   isGameLost,
   isHardMode,
   guesses,
   showAlert,
+  mode,
+  solution,
+  onNewPractice,
 }) => {
+  const fileInputRef = useRef();
+  const isDaily = mode === GAME_MODES.DAILY;
+  const isPractice = mode === GAME_MODES.PRACTICE;
+  const isGameOver = isGameWon || isGameLost;
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(gameStats, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'wordle-stats.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showAlert('Statistics exported', 'success');
+  };
+
+  const handleImportClick = () => fileInputRef.current.click();
+
+  const handleImport = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (!isValidStats(data)) throw new Error('Invalid stats file');
+        setStats(data);
+        showAlert('Statistics imported', 'success');
+      } catch (error) {
+        showAlert('Invalid statistics file', 'error');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   };
 
   return (
@@ -40,7 +87,12 @@ const StatsModal = ({
           />
         ))}
       </div>
-      {(isGameWon || isGameLost) && (
+      {isGameOver && !isDaily && (
+        <div className={styles.answer}>
+          The word was <strong>{solution.toUpperCase()}</strong>
+        </div>
+      )}
+      {isGameOver && isDaily && (
         <div className={styles.result}>
           <div className={styles.countDown}>
             <h2>Next word in</h2>
@@ -55,6 +107,24 @@ const StatsModal = ({
           </div>
         </div>
       )}
+      {isGameOver && isPractice && (
+        <div className={styles.result}>
+          <div className={styles.share}>
+            <button onClick={onNewPractice}>New Practice Word</button>
+          </div>
+        </div>
+      )}
+      <div className={styles.backup}>
+        <button onClick={handleExport}>Export Stats</button>
+        <button onClick={handleImportClick}>Import Stats</button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className={styles.fileInput}
+          onChange={handleImport}
+        />
+      </div>
     </Modal>
   );
 };

@@ -1,10 +1,24 @@
 import { useEffect } from 'react';
 import classNames from 'classnames';
 import { getStatuses } from 'lib/words';
+import {
+  KEYBOARD_LAYOUTS,
+  DEFAULT_KEYBOARD_LAYOUT,
+} from 'constants/keyboardLayouts';
 import styles from './Keyboard.module.scss';
 
-const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
-  const charStatuses = getStatuses(guesses);
+const Keyboard = ({
+  onEnter,
+  onDelete,
+  onKeyDown,
+  guesses,
+  solution,
+  layout,
+}) => {
+  const charStatuses = getStatuses(guesses, solution);
+  const rows = (
+    KEYBOARD_LAYOUTS[layout] || KEYBOARD_LAYOUTS[DEFAULT_KEYBOARD_LAYOUT]
+  ).rows;
 
   useEffect(() => {
     const listener = e => {
@@ -29,38 +43,24 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
 
   return (
     <div className={styles.keyboard}>
-      <div className={styles.row}>
-        {['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-      </div>
-      <div className={styles.row}>
-        {['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-      </div>
-      <div className={styles.row}>
-        <Key value="DELETE" onClick={handleClick} status="action" />
-        {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-        <Key value="ENTER" onClick={handleClick} status="action" />
-      </div>
+      {rows.map((row, i) => (
+        <div className={styles.row} key={i}>
+          {i === rows.length - 1 && (
+            <Key value="DELETE" onClick={handleClick} status="action" />
+          )}
+          {row.map(char => (
+            <Key
+              key={char}
+              value={char}
+              status={charStatuses[char]}
+              onClick={handleClick}
+            />
+          ))}
+          {i === rows.length - 1 && (
+            <Key value="ENTER" onClick={handleClick} status="action" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };

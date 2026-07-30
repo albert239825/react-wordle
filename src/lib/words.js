@@ -9,9 +9,9 @@ export const isWordValid = word => {
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess, solutionWord = solution) => {
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = solutionWord.toLowerCase().split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -52,9 +52,9 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
+export const getStatuses = (guesses, solutionWord = solution) => {
   const charObj = {};
-  const splitSolution = solution.toUpperCase().split('');
+  const splitSolution = solutionWord.toUpperCase().split('');
 
   guesses.forEach(word => {
     word.split('').forEach((letter, i) => {
@@ -70,14 +70,18 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (
+  word,
+  guesses,
+  solutionWord = solution
+) => {
   if (guesses.length === 0) {
     return false;
   }
 
   const lettersLeftArray = [];
   const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, solutionWord);
   const splitWord = word.toUpperCase().split('');
   const splitGuess = guess.toUpperCase().split('');
 
@@ -129,6 +133,24 @@ export const addStatsForCompletedGame = (gameStats, count) => {
   return stats;
 };
 
+// Validate a parsed object looks like a stats record before importing it.
+export const isValidStats = data => {
+  if (!data || typeof data !== 'object') return false;
+  const keys = [
+    'gamesFailed',
+    'currentStreak',
+    'bestStreak',
+    'totalGames',
+    'successRate',
+  ];
+  const numbersOk = keys.every(key => typeof data[key] === 'number');
+  const distOk =
+    Array.isArray(data.winDistribution) &&
+    data.winDistribution.every(value => typeof value === 'number');
+
+  return numbersOk && distOk;
+};
+
 const getSuccessRate = gameStats => {
   const { totalGames, gamesFailed } = gameStats;
 
@@ -148,10 +170,10 @@ ${isHardMode ? 'Hard Mode' : ''}
   navigator.clipboard.writeText(textToShare);
 };
 
-export const generateEmojiGrid = guesses => {
+export const generateEmojiGrid = (guesses, solutionWord = solution) => {
   return guesses
     .map(guess => {
-      const status = getGuessStatuses(guess);
+      const status = getGuessStatuses(guess, solutionWord);
       const splitGuess = guess.split('');
 
       return splitGuess
@@ -170,13 +192,14 @@ export const generateEmojiGrid = guesses => {
     .join('\n');
 };
 
+// January 1, 2022 Game Epoch
+export const GAME_EPOCH_MS = new Date(2022, 0).valueOf();
+export const MS_IN_DAY = 86400000;
+
 export const getWordOfDay = () => {
-  // January 1, 2022 Game Epoch
-  const epochMs = new Date(2022, 0).valueOf();
   const now = Date.now();
-  const msInDay = 86400000;
-  const index = Math.floor((now - epochMs) / msInDay);
-  const nextday = (index + 1) * msInDay + epochMs;
+  const index = Math.floor((now - GAME_EPOCH_MS) / MS_IN_DAY);
+  const nextday = (index + 1) * MS_IN_DAY + GAME_EPOCH_MS;
 
   return {
     solution: WORDS[index % WORDS.length],
@@ -184,5 +207,23 @@ export const getWordOfDay = () => {
     tomorrow: nextday,
   };
 };
+
+// Resolve the solution word for any puzzle index (daily, archive, or practice).
+export const getWordByIndex = index => {
+  const len = WORDS.length;
+  return WORDS[((index % len) + len) % len];
+};
+
+// Random puzzle index used by Practice mode.
+export const getRandomSolutionIndex = () =>
+  Math.floor(Math.random() * WORDS.length);
+
+// The date (midnight) a given puzzle index was/will be the daily word.
+export const getDateFromIndex = index =>
+  new Date(GAME_EPOCH_MS + index * MS_IN_DAY);
+
+// The puzzle index for a given date.
+export const getIndexFromDate = date =>
+  Math.floor((new Date(date).valueOf() - GAME_EPOCH_MS) / MS_IN_DAY);
 
 export const { solution, solutionIndex, tomorrow } = getWordOfDay();
