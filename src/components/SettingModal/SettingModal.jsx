@@ -24,7 +24,10 @@ const SettingModal = ({
       <Row title="Dark Mode">
         <Switch isOn={isDarkMode} onToggle={setIsDarkMode} />
       </Row>
-      <Row title="Keyboard Layout" desc="Layout of the on-screen keyboard">
+      <Row
+        title="Keyboard Layout"
+        desc="Change the letter arrangement of the on-screen keyboard (QWERTY, AZERTY, or Colemak)"
+      >
         <select
           className={styles.select}
           value={keyboardLayout}
