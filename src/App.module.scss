@@ -47,6 +47,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.archiveBanner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+
+  button {
+    border: none;
+    border-radius: 5px;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    background: var(--color-key);
+    color: var(--color-key-text);
+  }
+}
+
 .container {
   height: 100vh;
   max-width: 1200px;
