@@ -94,6 +94,30 @@ h2 {
   }
 }
 
+.backup {
+  margin-top: 1.5rem;
+
+  .backupButtons {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      flex: 1;
+      background: #a01ef7;
+      display: block;
+      color: #fff;
+      border-radius: 10px;
+      font-size: 1.4rem;
+      font-weight: 500;
+      padding: 0.5rem 0;
+    }
+  }
+
+  .hiddenInput {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 480px) {
   h2 {
     font-size: 1.2rem;
