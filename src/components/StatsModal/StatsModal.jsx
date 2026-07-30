@@ -1,8 +1,10 @@
+import { useRef } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
 import { shareStatus, tomorrow } from 'lib/words';
+import { downloadBackup, parseBackup } from 'lib/statsBackup';
 
 const StatsModal = ({
   isOpen,
@@ -14,10 +16,40 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  onImportBackup,
 }) => {
+  const fileInputRef = useRef();
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleExport = () => {
+    downloadBackup();
+    showAlert('Stats backup downloaded', 'success');
+  };
+
+  const handleImportClick = () => fileInputRef.current.click();
+
+  const handleImportFile = event => {
+    const file = event.target.files[0];
+    // Reset so selecting the same file again still fires onChange
+    event.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = parseBackup(reader.result);
+        onImportBackup(data);
+        showAlert('Stats restored from backup', 'success');
+      } catch (error) {
+        showAlert(error.message, 'error');
+      }
+    };
+    reader.onerror = () => showAlert('Could not read the file', 'error');
+    reader.readAsText(file);
   };
 
   return (
@@ -55,6 +87,20 @@ const StatsModal = ({
           </div>
         </div>
       )}
+      <div className={styles.backup}>
+        <h2>Backup</h2>
+        <div className={styles.backupButtons}>
+          <button onClick={handleExport}>Export</button>
+          <button onClick={handleImportClick}>Import</button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          className={styles.hiddenInput}
+          onChange={handleImportFile}
+        />
+      </div>
     </Modal>
   );
 };

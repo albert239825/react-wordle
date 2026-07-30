@@ -101,6 +101,16 @@ function App() {
     setHardMode(!isHardMode);
   };
 
+  const handleImportBackup = data => {
+    if (data.gameStats) setStats(data.gameStats);
+    if (data.boardState) {
+      setBoardState(data.boardState);
+      if (data.boardState.solutionIndex === solutionIndex) {
+        setGuesses(data.boardState.guesses);
+      }
+    }
+  };
+
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
@@ -182,6 +192,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        onImportBackup={handleImportBackup}
       />
     </div>
   );
