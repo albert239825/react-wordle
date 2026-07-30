@@ -22,7 +22,9 @@
 .list {
   list-style: none;
   max-height: 300px;
+  overflow-x: hidden;
   overflow-y: auto;
+  padding-right: 0.25rem;
   text-align: left;
 }
 
