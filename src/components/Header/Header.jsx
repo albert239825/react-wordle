@@ -18,14 +18,20 @@ const Header = ({
 }) => {
   const isPractice = mode === GAME_MODES.PRACTICE;
 
+  // Drop focus so a subsequent Enter keypress goes to the game, not the button.
+  const run = handler => e => {
+    e.currentTarget.blur();
+    handler();
+  };
+
   return (
     <header>
       <div>
-        <button onClick={() => setIsInfoModalOpen(true)}>
+        <button onClick={run(() => setIsInfoModalOpen(true))}>
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
         <button
-          onClick={onTogglePractice}
+          onClick={run(onTogglePractice)}
           title={isPractice ? 'Leave Practice mode' : 'Enter Practice mode'}
         >
           <BsController
@@ -34,7 +40,7 @@ const Header = ({
           />
         </button>
         <button
-          onClick={() => setIsArchiveModalOpen(true)}
+          onClick={run(() => setIsArchiveModalOpen(true))}
           title="Puzzle archive"
         >
           <BsCalendarWeek size="1.6rem" color="var(--color-icon)" />
@@ -42,10 +48,10 @@ const Header = ({
       </div>
       <h1>WORDLE</h1>
       <div>
-        <button onClick={() => setIsStatsModalOpen(true)}>
+        <button onClick={run(() => setIsStatsModalOpen(true))}>
           <BsBarChart size="1.6rem" color="var(--color-icon)" />
         </button>
-        <button onClick={() => setIsSettingsModalOpen(true)}>
+        <button onClick={run(() => setIsSettingsModalOpen(true))}>
           <BsGear size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
