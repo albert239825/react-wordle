@@ -1,10 +1,14 @@
 import { useEffect } from 'react';
 import classNames from 'classnames';
 import { getStatuses } from 'lib/words';
+import { DEFAULT_KEYBOARD_LAYOUT, KEYBOARD_LAYOUTS } from 'constants/settings';
 import styles from './Keyboard.module.scss';
 
-const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
+const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses, layout }) => {
   const charStatuses = getStatuses(guesses);
+  const { rows } =
+    KEYBOARD_LAYOUTS[layout] ?? KEYBOARD_LAYOUTS[DEFAULT_KEYBOARD_LAYOUT];
+  const lastRowIndex = rows.length - 1;
 
   useEffect(() => {
     const listener = e => {
@@ -29,38 +33,24 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
 
   return (
     <div className={styles.keyboard}>
-      <div className={styles.row}>
-        {['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-      </div>
-      <div className={styles.row}>
-        {['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-      </div>
-      <div className={styles.row}>
-        <Key value="DELETE" onClick={handleClick} status="action" />
-        {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map(char => (
-          <Key
-            key={char}
-            value={char}
-            status={charStatuses[char]}
-            onClick={handleClick}
-          />
-        ))}
-        <Key value="ENTER" onClick={handleClick} status="action" />
-      </div>
+      {rows.map((row, index) => (
+        <div className={styles.row} key={index}>
+          {index === lastRowIndex && (
+            <Key value="DELETE" onClick={handleClick} status="action" />
+          )}
+          {row.map(char => (
+            <Key
+              key={char}
+              value={char}
+              status={charStatuses[char]}
+              onClick={handleClick}
+            />
+          ))}
+          {index === lastRowIndex && (
+            <Key value="ENTER" onClick={handleClick} status="action" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };

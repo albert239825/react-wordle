@@ -17,6 +17,7 @@ import {
 } from 'lib/words';
 import {
   ALERT_DELAY,
+  DEFAULT_KEYBOARD_LAYOUT,
   MAX_CHALLENGES,
   MAX_WORD_LENGTH,
 } from 'constants/settings';
@@ -30,6 +31,10 @@ function App() {
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [keyboardLayout, setKeyboardLayout] = useLocalStorage(
+    'keyboard-layout',
+    DEFAULT_KEYBOARD_LAYOUT
+  );
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -159,6 +164,7 @@ function App() {
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        layout={keyboardLayout}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -169,8 +175,10 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
+        keyboardLayout={keyboardLayout}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
+        setKeyboardLayout={setKeyboardLayout}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
