@@ -1,5 +1,6 @@
 import Modal from 'components/Modal';
 import Switch from 'components/Switch';
+import { KEYBOARD_LAYOUTS } from 'constants/settings';
 import styles from './SettingModal.module.scss';
 
 const SettingModal = ({
@@ -7,8 +8,10 @@ const SettingModal = ({
   onClose,
   isHardMode,
   isDarkMode,
+  keyboardLayout,
   setIsHardMode,
   setIsDarkMode,
+  setKeyboardLayout,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -19,6 +22,25 @@ const SettingModal = ({
         onToggle={setIsHardMode}
       />
       <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
+      <div className={styles.row}>
+        <div>
+          <h2 className={styles.title}>Keyboard Layout</h2>
+          <h3 className={styles.desc}>Layout of the on-screen keyboard</h3>
+        </div>
+        <div>
+          <select
+            className={styles.select}
+            value={keyboardLayout}
+            onChange={e => setKeyboardLayout(e.target.value)}
+          >
+            {Object.entries(KEYBOARD_LAYOUTS).map(([value, { name }]) => (
+              <option key={value} value={value}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
     </Modal>
   );
 };
