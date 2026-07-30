@@ -116,8 +116,8 @@ const StatsModal = ({
         </div>
       )}
       <div className={styles.backup}>
-        <button onClick={handleExport}>Export Stats</button>
-        <button onClick={handleImportClick}>Import Stats</button>
+        <button onClick={handleExport}>Export stats</button>
+        <button onClick={handleImportClick}>Import stats</button>
         <input
           ref={fileInputRef}
           type="file"
