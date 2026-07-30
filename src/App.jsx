@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
@@ -6,6 +6,7 @@ import Alert from 'components/Alert';
 import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
+import ArchiveModal from 'components/ArchiveModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
 import {
@@ -14,6 +15,8 @@ import {
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
+  getWordOfIndex,
+  formatPuzzleDate,
 } from 'lib/words';
 import {
   ALERT_DELAY,
@@ -38,20 +41,31 @@ function App() {
     totalGames: 0,
     successRate: 0,
   });
+  const [archiveGames, setArchiveGames] = useLocalStorage('archiveGames', {});
   const [currentGuess, setCurrentGuess] = useState('');
-  const [guesses, setGuesses] = useState(() => {
+  const [dailyGuesses, setDailyGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
+  // Index of the archived puzzle being played, null while playing today's
+  const [archiveIndex, setArchiveIndex] = useState(null);
+  const [archiveGuesses, setArchiveGuesses] = useState([]);
   const [isJiggling, setIsJiggling] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const { showAlert } = useAlert();
+  const playedIndex = useRef(archiveIndex);
+
+  const isArchive = archiveIndex !== null;
+  const activeSolution = isArchive ? getWordOfIndex(archiveIndex) : solution;
+  const guesses = isArchive ? archiveGuesses : dailyGuesses;
+  const setGuesses = isArchive ? setArchiveGuesses : setDailyGuesses;
 
   // Show welcome modal
   useEffect(() => {
@@ -63,28 +77,46 @@ function App() {
   // Save boardState to localStorage
   useEffect(() => {
     setBoardState({
-      guesses,
+      guesses: dailyGuesses,
       solutionIndex,
     });
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [dailyGuesses]);
+
+  // Save archived games to localStorage, keeping them out of the daily board
+  useEffect(() => {
+    if (!isArchive) return;
+    setArchiveGames({ ...archiveGames, [archiveIndex]: archiveGuesses });
+    // eslint-disable-next-line
+  }, [archiveGuesses, archiveIndex]);
 
   // Check game winning or losing
   useEffect(() => {
-    if (guesses.includes(solution.toUpperCase())) {
-      setIsGameWon(true);
+    const hasSwitchedPuzzle = playedIndex.current !== archiveIndex;
+    playedIndex.current = archiveIndex;
+
+    const isWon = guesses.includes(activeSolution.toUpperCase());
+    const isLost = !isWon && guesses.length === MAX_CHALLENGES;
+
+    setIsGameWon(isWon);
+    setIsGameLost(isLost);
+
+    // Only announce the result of a guess, not of a restored board
+    if (hasSwitchedPuzzle || (!isWon && !isLost)) return;
+
+    if (isWon) {
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
-      setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
-    } else if (guesses.length === MAX_CHALLENGES) {
-      setIsGameLost(true);
+    } else {
       setTimeout(
-        () => showAlert(`The word was ${solution}`, 'error', true),
+        () => showAlert(`The word was ${activeSolution}`, 'error', true),
         ALERT_DELAY
       );
-      setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     }
+
+    if (!isArchive)
+      setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [guesses, archiveIndex]);
 
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
@@ -99,6 +131,18 @@ function App() {
   const handleHardMode = () => {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
+  };
+
+  const handleSelectArchive = index => {
+    setArchiveIndex(index);
+    setArchiveGuesses(archiveGames[index] ?? []);
+    setCurrentGuess('');
+    setIsArchiveModalOpen(false);
+  };
+
+  const handleReturnToDaily = () => {
+    setArchiveIndex(null);
+    setCurrentGuess('');
   };
 
   const handleKeyDown = letter =>
@@ -123,17 +167,24 @@ function App() {
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        guesses,
+        activeSolution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
       }
     }
 
-    if (currentGuess === solution.toUpperCase()) {
-      setStats(addStatsForCompletedGame(stats, guesses.length));
-    } else if (guesses.length + 1 === MAX_CHALLENGES) {
-      setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+    // Archived games never affect the daily statistics
+    if (!isArchive) {
+      if (currentGuess === activeSolution.toUpperCase()) {
+        setStats(addStatsForCompletedGame(stats, guesses.length));
+      } else if (guesses.length + 1 === MAX_CHALLENGES) {
+        setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+      }
     }
 
     setGuesses([...guesses, currentGuess]);
@@ -146,19 +197,30 @@ function App() {
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
+        setIsArchiveModalOpen={setIsArchiveModalOpen}
       />
       <Alert />
+      {isArchive && (
+        <div className={styles.archiveBanner}>
+          <span>
+            Archive #{archiveIndex} &middot; {formatPuzzleDate(archiveIndex)}
+          </span>
+          <button onClick={handleReturnToDaily}>Back to today</button>
+        </div>
+      )}
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
+        solution={activeSolution}
       />
       <Keyboard
         onEnter={handleEnter}
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        solution={activeSolution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -176,12 +238,19 @@ function App() {
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
         gameStats={stats}
-        numberOfGuessesMade={guesses.length}
-        isGameWon={isGameWon}
-        isGameLost={isGameLost}
+        numberOfGuessesMade={isArchive ? 0 : guesses.length}
+        isGameWon={!isArchive && isGameWon}
+        isGameLost={!isArchive && isGameLost}
         isHardMode={isHardMode}
-        guesses={guesses}
+        guesses={dailyGuesses}
         showAlert={showAlert}
+      />
+      <ArchiveModal
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        archiveGames={archiveGames}
+        archiveIndex={archiveIndex}
+        onSelect={handleSelectArchive}
       />
     </div>
   );

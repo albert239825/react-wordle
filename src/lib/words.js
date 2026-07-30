@@ -9,9 +9,9 @@ export const isWordValid = word => {
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess, solutionWord = solution) => {
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = solutionWord.toLowerCase().split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -52,9 +52,9 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
+export const getStatuses = (guesses, solutionWord = solution) => {
   const charObj = {};
-  const splitSolution = solution.toUpperCase().split('');
+  const splitSolution = solutionWord.toUpperCase().split('');
 
   guesses.forEach(word => {
     word.split('').forEach((letter, i) => {
@@ -70,14 +70,18 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (
+  word,
+  guesses,
+  solutionWord = solution
+) => {
   if (guesses.length === 0) {
     return false;
   }
 
   const lettersLeftArray = [];
   const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, solutionWord);
   const splitWord = word.toUpperCase().split('');
   const splitGuess = guess.toUpperCase().split('');
 
@@ -170,19 +174,31 @@ export const generateEmojiGrid = guesses => {
     .join('\n');
 };
 
+// January 1, 2022 Game Epoch
+const EPOCH_MS = new Date(2022, 0).valueOf();
+const MS_IN_DAY = 86400000;
+
 export const getWordOfDay = () => {
-  // January 1, 2022 Game Epoch
-  const epochMs = new Date(2022, 0).valueOf();
   const now = Date.now();
-  const msInDay = 86400000;
-  const index = Math.floor((now - epochMs) / msInDay);
-  const nextday = (index + 1) * msInDay + epochMs;
+  const index = Math.floor((now - EPOCH_MS) / MS_IN_DAY);
+  const nextday = (index + 1) * MS_IN_DAY + EPOCH_MS;
 
   return {
-    solution: WORDS[index % WORDS.length],
+    solution: getWordOfIndex(index),
     solutionIndex: index,
     tomorrow: nextday,
   };
 };
+
+export const getWordOfIndex = index => WORDS[index % WORDS.length];
+
+export const getDateOfIndex = index => new Date(EPOCH_MS + index * MS_IN_DAY);
+
+export const formatPuzzleDate = index =>
+  getDateOfIndex(index).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 
 export const { solution, solutionIndex, tomorrow } = getWordOfDay();
