@@ -23,6 +23,15 @@ import {
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
+const initialStats = {
+  winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+  gamesFailed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  totalGames: 0,
+  successRate: 0,
+};
+
 function App() {
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
@@ -30,14 +39,7 @@ function App() {
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', {
-    winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
-    gamesFailed: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalGames: 0,
-    successRate: 0,
-  });
+  const [stats, setStats] = useLocalStorage('gameStats', initialStats);
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
@@ -100,6 +102,8 @@ function App() {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
   };
+
+  const handleResetStats = () => setStats(initialStats);
 
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
@@ -182,6 +186,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        onResetStats={handleResetStats}
       />
     </div>
   );

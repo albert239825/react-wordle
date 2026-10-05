@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
@@ -14,10 +15,23 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  onResetStats,
 }) => {
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) setIsConfirmingReset(false);
+  }, [isOpen]);
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleResetStats = () => {
+    onResetStats();
+    setIsConfirmingReset(false);
+    showAlert('Statistics reset', 'success');
   };
 
   return (
@@ -40,6 +54,63 @@ const StatsModal = ({
           />
         ))}
       </div>
+      {isConfirmingReset ? (
+        <div
+          style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            border: '1px solid var(--color-border, #5d6061)',
+            borderRadius: '10px',
+            textAlign: 'center',
+          }}
+        >
+          <p
+            style={{
+              margin: '0 0 1rem',
+              color: 'var(--color-text-primary)',
+            }}
+          >
+            Reset all statistics? This cannot be undone.
+          </p>
+          <button
+            onClick={handleResetStats}
+            style={{
+              background: '#d33',
+              color: '#fff',
+              borderRadius: '10px',
+              fontWeight: 500,
+              padding: '0.5rem 1rem',
+              marginRight: '0.5rem',
+            }}
+          >
+            Yes, reset
+          </button>
+          <button
+            onClick={() => setIsConfirmingReset(false)}
+            style={{
+              background: '#5d6061',
+              color: '#fff',
+              borderRadius: '10px',
+              fontWeight: 500,
+              padding: '0.5rem 1rem',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsConfirmingReset(true)}
+          style={{
+            marginTop: '1rem',
+            color: 'var(--color-text-secondary)',
+            fontSize: '0.9rem',
+            textDecoration: 'underline',
+          }}
+        >
+          Reset statistics
+        </button>
+      )}
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
           <div className={styles.countDown}>
