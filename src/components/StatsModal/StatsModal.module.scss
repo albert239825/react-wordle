@@ -62,6 +62,42 @@ h2 {
   }
 }
 
+.reset {
+  margin-top: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.confirmReset {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #5d6061);
+  border-radius: 10px;
+  text-align: center;
+
+  p {
+    margin: 0 0 1rem;
+    color: var(--color-text-primary);
+  }
+
+  button {
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+  }
+
+  .confirm {
+    background: #d33;
+    margin-right: 0.5rem;
+  }
+
+  .cancel {
+    background: #5d6061;
+  }
+}
+
 .result {
   display: flex;
   padding: 0 2rem;

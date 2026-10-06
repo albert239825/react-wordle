@@ -55,58 +55,22 @@ const StatsModal = ({
         ))}
       </div>
       {isConfirmingReset ? (
-        <div
-          style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            border: '1px solid var(--color-border, #5d6061)',
-            borderRadius: '10px',
-            textAlign: 'center',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 1rem',
-              color: 'var(--color-text-primary)',
-            }}
-          >
-            Reset all statistics? This cannot be undone.
-          </p>
-          <button
-            onClick={handleResetStats}
-            style={{
-              background: '#d33',
-              color: '#fff',
-              borderRadius: '10px',
-              fontWeight: 500,
-              padding: '0.5rem 1rem',
-              marginRight: '0.5rem',
-            }}
-          >
+        <div className={styles.confirmReset}>
+          <p>Reset all statistics? This cannot be undone.</p>
+          <button className={styles.confirm} onClick={handleResetStats}>
             Yes, reset
           </button>
           <button
+            className={styles.cancel}
             onClick={() => setIsConfirmingReset(false)}
-            style={{
-              background: '#5d6061',
-              color: '#fff',
-              borderRadius: '10px',
-              fontWeight: 500,
-              padding: '0.5rem 1rem',
-            }}
           >
             Cancel
           </button>
         </div>
       ) : (
         <button
+          className={styles.reset}
           onClick={() => setIsConfirmingReset(true)}
-          style={{
-            marginTop: '1rem',
-            color: 'var(--color-text-secondary)',
-            fontSize: '0.9rem',
-            textDecoration: 'underline',
-          }}
         >
           Reset statistics
         </button>
