@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { useRef } from 'react';
 import styles from './Switch.module.scss';
 
-const Switch = ({ isOn, onToggle }) => {
+const Switch = ({ label, isOn, onToggle }) => {
   const ref = useRef();
 
   const classes = classNames({
@@ -15,6 +15,7 @@ const Switch = ({ isOn, onToggle }) => {
       <input
         className={styles.switch}
         type="checkbox"
+        aria-label={label}
         ref={ref}
         checked={isOn}
         onChange={onToggle}
