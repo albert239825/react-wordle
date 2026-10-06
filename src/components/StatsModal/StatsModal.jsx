@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
@@ -14,10 +15,23 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  onResetStats,
 }) => {
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) setIsConfirmingReset(false);
+  }, [isOpen]);
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
+  };
+
+  const handleResetStats = () => {
+    onResetStats();
+    setIsConfirmingReset(false);
+    showAlert('Statistics reset', 'success');
   };
 
   return (
@@ -35,11 +49,32 @@ const StatsModal = ({
             key={i}
             index={i}
             currentDayStatRow={numberOfGuessesMade === i + 1}
-            size={90 * (value / Math.max(...gameStats.winDistribution))}
+            size={90 * (value / Math.max(...gameStats.winDistribution, 1))}
             label={String(value)}
           />
         ))}
       </div>
+      {isConfirmingReset ? (
+        <div className={styles.confirmReset}>
+          <p>Reset all statistics? This cannot be undone.</p>
+          <button className={styles.confirm} onClick={handleResetStats}>
+            Yes, reset
+          </button>
+          <button
+            className={styles.cancel}
+            onClick={() => setIsConfirmingReset(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          className={styles.reset}
+          onClick={() => setIsConfirmingReset(true)}
+        >
+          Reset statistics
+        </button>
+      )}
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
           <div className={styles.countDown}>
