@@ -30,6 +30,10 @@ function App() {
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [isReducedMotion, setIsReducedMotion] = useLocalStorage(
+    'reduced-motion',
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+  );
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -91,6 +95,11 @@ function App() {
     else document.body.removeAttribute('data-theme');
   }, [isDarkMode]);
 
+  useEffect(() => {
+    if (isReducedMotion) document.body.setAttribute('data-reduced-motion', '');
+    else document.body.removeAttribute('data-reduced-motion');
+  }, [isReducedMotion]);
+
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     setTheme(isDarkMode ? 'light' : 'dark');
@@ -100,6 +109,8 @@ function App() {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
   };
+
+  const handleReducedMotion = () => setIsReducedMotion(!isReducedMotion);
 
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
@@ -169,8 +180,10 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
+        isReducedMotion={isReducedMotion}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
+        setIsReducedMotion={handleReducedMotion}
       />
       <StatsModal
         isOpen={isStatsModalOpen}

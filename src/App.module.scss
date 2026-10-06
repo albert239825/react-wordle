@@ -36,6 +36,17 @@
   }
 }
 
+[data-reduced-motion],
+[data-reduced-motion] *,
+[data-reduced-motion] *::before,
+[data-reduced-motion] *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+
 body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;

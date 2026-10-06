@@ -7,8 +7,10 @@ const SettingModal = ({
   onClose,
   isHardMode,
   isDarkMode,
+  isReducedMotion,
   setIsHardMode,
   setIsDarkMode,
+  setIsReducedMotion,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -19,6 +21,12 @@ const SettingModal = ({
         onToggle={setIsHardMode}
       />
       <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
+      <Row
+        title="Reduced Motion"
+        desc="Turn off tile flips, shakes and other animations"
+        isOn={isReducedMotion}
+        onToggle={setIsReducedMotion}
+      />
     </Modal>
   );
 };
@@ -31,7 +39,7 @@ const Row = ({ title, desc, isOn, onToggle }) => {
         <h3 className={styles.desc}>{desc}</h3>
       </div>
       <div>
-        <Switch isOn={isOn} onToggle={onToggle} />
+        <Switch label={title} isOn={isOn} onToggle={onToggle} />
       </div>
     </div>
   );
